@@ -27,8 +27,8 @@ const Sidebar = () => {
             <div className='bg-[#121212] rounded-xl p-3 flex flex-col gap-1'>
                 {navItem('/', '🏠', 'Home')}
                 {navItem('/liked', '❤️', 'Liked Songs')}
+                                <SignedIn>
                 {navItem('/room', '🎧', 'Listening Rooms')}
-                <SignedIn>
                     {navItem('/dashboard', '🎵', 'My Uploads')}
                 </SignedIn>
                 {navItem('/admin', '⚙️', 'Upload Music')}

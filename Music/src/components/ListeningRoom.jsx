@@ -91,22 +91,22 @@ const ListeningRoom = () => {
         setUsername(name);
         const id = generateRoomId();
         setRoomId(id);
-        const socket = connectSocket();
-        socket.on('connect', () => {
-            socket.emit('createRoom', { roomId: id, song: selectedSong, username: name });
-        });
         setIsHost(true);
+        const socket = connectSocket();
+        const doCreate = () => socket.emit('createRoom', { roomId: id, song: selectedSong, username: name });
+        if (socket.connected) doCreate();
+        else socket.once('connect', doCreate);
     };
 
     const handleJoinRoom = () => {
         if (!usernameInput.trim()) return;
         const name = usernameInput.trim();
         setUsername(name);
-        const socket = connectSocket();
-        socket.on('connect', () => {
-            socket.emit('joinRoom', { roomId: roomId, username: name });
-        });
         setIsHost(false);
+        const socket = connectSocket();
+        const doJoin = () => socket.emit('joinRoom', { roomId: roomId, username: name });
+        if (socket.connected) doJoin();
+        else socket.once('connect', doJoin);
     };
 
     // Host sync interval — broadcasts every 2s

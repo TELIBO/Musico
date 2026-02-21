@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Musicly Admin Panel</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: sans-serif; background: #111; color: #eee; padding: 20px; }
+    h1 { color: #1db954; margin-bottom: 20px; font-size: 24px; }
+    h2 { color: #fff; margin: 24px 0 12px; font-size: 18px; border-bottom: 1px solid #333; padding-bottom: 6px; }
+    .tabs { display: flex; gap: 8px; margin-bottom: 20px; }
+    .tab { padding: 8px 20px; border-radius: 20px; cursor: pointer; border: none; font-size: 14px; font-weight: bold; }
+    .tab.active { background: #1db954; color: black; }
+    .tab:not(.active) { background: #2a2a2a; color: #aaa; }
+    .panel { display: none; } .panel.active { display: block; }
+    label { display: block; margin-bottom: 12px; font-size: 13px; color: #aaa; }
+    input[type=text], input[type=color] { display: block; width: 100%; padding: 8px 12px; margin-top: 4px; background: #2a2a2a; border: 1px solid #444; border-radius: 6px; color: #fff; font-size: 14px; }
+    input[type=file] { display: block; margin-top: 4px; color: #aaa; }
+    button.submit { background: #1db954; color: black; border: none; padding: 10px 24px; border-radius: 20px; font-weight: bold; cursor: pointer; font-size: 14px; margin-top: 8px; }
+    button.submit:hover { background: #17a349; }
+    button.del { background: #e53935; color: white; border: none; padding: 4px 12px; border-radius: 6px; cursor: pointer; font-size: 12px; }
+    pre#output { background: #1a1a1a; color: #1db954; padding: 14px; border-radius: 8px; min-height: 50px; margin-top: 16px; font-size: 13px; overflow: auto; max-height: 300px; }
+    .song-card, .album-card { display: flex; align-items: center; gap: 12px; background: #1a1a1a; padding: 10px 14px; border-radius: 8px; margin-bottom: 8px; }
+    .song-card img, .album-card img { width: 48px; height: 48px; object-fit: cover; border-radius: 6px; }
+    .song-card .info, .album-card .info { flex: 1; }
+    .song-card .info p, .album-card .info p { font-size: 13px; color: #aaa; }
+    .song-card .info strong, .album-card .info strong { font-size: 14px; color: #fff; }
+    #listContainer, #albumListContainer { margin-top: 12px; }
+  </style>
+</head>
+<body>
+  <h1>🎵 Musicly Admin Panel</h1>
+
+  <div class="tabs">
+    <button class="tab active" onclick="showTab('songs')">Songs</button>
+    <button class="tab" onclick="showTab('albums')">Albums</button>
+  </div>
+
+  <!-- SONGS PANEL -->
+  <div id="songs" class="panel active">
+    <h2>Add Song</h2>
+    <form id="uploadForm">
+      <label>Name <input type="text" name="name" required /></label>
+      <label>Description <input type="text" name="desc" required /></label>
+      <label>Album Name <input type="text" name="album" required /></label>
+      <label>Audio (mp3) <input type="file" name="audio" accept="audio/*" required /></label>
+      <label>Image <input type="file" name="image" accept="image/*" required /></label>
+      <button type="submit" class="submit">Upload Song</button>
+    </form>
+
+    <h2>Song List <button class="submit" style="font-size:12px;padding:4px 14px;margin-left:10px" onclick="loadSongs()">Refresh</button></h2>
+    <div id="listContainer"><p style="color:#555">Click Refresh to load songs</p></div>
+  </div>
+
+  <!-- ALBUMS PANEL -->
+  <div id="albums" class="panel">
+    <h2>Add Album</h2>
+    <form id="albumForm">
+      <label>Name <input type="text" name="name" required /></label>
+      <label>Description <input type="text" name="desc" required /></label>
+      <label>Background Colour <input type="color" name="bgColour" value="#1a1a2e" required /></label>
+      <label>Image <input type="file" name="image" accept="image/*" required /></label>
+      <button type="submit" class="submit">Create Album</button>
+    </form>
+
+    <h2>Album List <button class="submit" style="font-size:12px;padding:4px 14px;margin-left:10px" onclick="loadAlbums()">Refresh</button></h2>
+    <div id="albumListContainer"><p style="color:#555">Click Refresh to load albums</p></div>
+  </div>
+
+  <h2>Response</h2>
+  <pre id="output">Waiting...</pre>
+
+  <script>
+    const BASE = "http://localhost:4000";
+    const output = document.getElementById("output");
+
+    function showTab(name) {
+      document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.getElementById(name).classList.add('active');
+      event.target.classList.add('active');
+    }
+
+    // Add Song
+    document.getElementById("uploadForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      output.textContent = "Uploading... please wait ⏳";
+      try {
+        const res = await fetch(`${BASE}/api/song/add`, { method: "POST", body: new FormData(e.target) });
+        const data = await res.json();
+        output.textContent = JSON.stringify(data, null, 2);
+        if (data.success) { e.target.reset(); loadSongs(); }
+      } catch (err) { output.textContent = "ERROR: " + err.message; }
+    });
+
+    // Add Album
+    document.getElementById("albumForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      output.textContent = "Creating album... please wait ⏳";
+      try {
+        const res = await fetch(`${BASE}/api/album/add`, { method: "POST", body: new FormData(e.target) });
+        const data = await res.json();
+        output.textContent = JSON.stringify(data, null, 2);
+        if (data.success) { e.target.reset(); loadAlbums(); }
+      } catch (err) { output.textContent = "ERROR: " + err.message; }
+    });
+
+    async function loadSongs() {
+      output.textContent = "Loading...";
+      try {
+        const data = await (await fetch(`${BASE}/api/song/list`)).json();
+        output.textContent = JSON.stringify(data, null, 2);
+        const container = document.getElementById("listContainer");
+        if (!data.success || data.songs.length === 0) { container.innerHTML = '<p style="color:#555">No songs yet</p>'; return; }
+        container.innerHTML = data.songs.map(s => `
+          <div class="song-card">
+            <img src="${s.image}" />
+            <div class="info"><strong>${s.name}</strong><p>${s.desc} &bull; ${s.duration}</p></div>
+            <button class="del" onclick="deleteSong('${s._id}')">Delete</button>
+          </div>`).join('');
+      } catch (err) { output.textContent = "ERROR: " + err.message; }
+    }
+
+    async function loadAlbums() {
+      output.textContent = "Loading...";
+      try {
+        const data = await (await fetch(`${BASE}/api/album/list`)).json();
+        output.textContent = JSON.stringify(data, null, 2);
+        const container = document.getElementById("albumListContainer");
+        if (!data.success || data.albums.length === 0) { container.innerHTML = '<p style="color:#555">No albums yet</p>'; return; }
+        container.innerHTML = data.albums.map(a => `
+          <div class="album-card">
+            <img src="${a.image}" />
+            <div class="info"><strong>${a.name}</strong><p>${a.desc}</p></div>
+            <div style="width:24px;height:24px;border-radius:50%;background:${a.bgColour};border:1px solid #555;margin-right:8px"></div>
+            <button class="del" onclick="deleteAlbum('${a._id}')">Delete</button>
+          </div>`).join('');
+      } catch (err) { output.textContent = "ERROR: " + err.message; }
+    }
+
+    async function deleteSong(id) {
+      if (!confirm("Delete this song?")) return;
+      const data = await (await fetch(`${BASE}/api/song/delete`, { method: "POST", headers: {"Content-Type":"application/json"}, body: JSON.stringify({ id }) })).json();
+      output.textContent = JSON.stringify(data, null, 2);
+      if (data.success) loadSongs();
+    }
+
+    async function deleteAlbum(id) {
+      if (!confirm("Delete this album?")) return;
+      const data = await (await fetch(`${BASE}/api/album/delete`, { method: "POST", headers: {"Content-Type":"application/json"}, body: JSON.stringify({ id }) })).json();
+      output.textContent = JSON.stringify(data, null, 2);
+      if (data.success) loadAlbums();
+    }
+
+    // Auto load on open
+    loadSongs();
+  </script>
+</body>
+</html>

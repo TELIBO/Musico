@@ -11,14 +11,18 @@ import connectCloudinary from "./src/config/cloudinary.js";
 //app config
 const app=express();
 const httpServer = createServer(app);
-const io = new Server(httpServer, { cors: { origin: "*" } });
+const ALLOWED_ORIGINS = [
+  'http://localhost:5173',
+  'https://musico-rust.vercel.app',
+];
+const io = new Server(httpServer, { cors: { origin: ALLOWED_ORIGINS, methods: ['GET','POST'] } });
 const port=process.env.PORT || 4000;
 connectDB();
 connectCloudinary();
 
 //middlewares
 app.use(express.json());
-app.use(cors());
+app.use(cors({ origin: ALLOWED_ORIGINS }));
 
 //initializing routes
 app.use("/api/song", songRouter);

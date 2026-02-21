@@ -42,7 +42,7 @@ const ListeningRoom = () => {
     }, [messages]);
 
     const connectSocket = () => {
-        const socket = io(SERVER, { transports: ['websocket'] });
+        const socket = io(SERVER, { transports: ['polling', 'websocket'] });
         socketRef.current = socket;
         socket.on('connect', () => setConnected(true));
         socket.on('disconnect', () => setConnected(false));

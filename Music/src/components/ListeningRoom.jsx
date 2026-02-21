@@ -4,7 +4,7 @@ import { io } from 'socket.io-client';
 import { PlayerContext } from '../../context/PlayerContext';
 import Navbar from './Navbar';
 
-const SERVER = 'http://localhost:4000';
+const SERVER = 'https://musico-y8f2.onrender.com';
 
 const generateRoomId = () => Math.random().toString(36).substring(2, 8).toUpperCase();
 

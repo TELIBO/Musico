@@ -52,8 +52,8 @@ const PlayerContextProvider = (props) => {
         try {
             setLoading(true);
             const [songRes, albumRes] = await Promise.all([
-                fetch("http://localhost:4000/api/song/list"),
-                fetch("http://localhost:4000/api/album/list"),
+                fetch("https://musico-y8f2.onrender.com/api/song/list"),
+                fetch("https://musico-y8f2.onrender.com/api/album/list"),
             ]);
             const songData = await songRes.json();
             const albumData = await albumRes.json();

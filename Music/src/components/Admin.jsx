@@ -3,7 +3,7 @@ import Navbar from './Navbar';
 import { PlayerContext } from '../../context/PlayerContext';
 import { useAuth, SignedIn, SignedOut, SignInButton, useUser } from '@clerk/clerk-react';
 
-const BASE = "http://localhost:4000";
+const BASE = "https://musico-y8f2.onrender.com";
 
 const Toast = ({ msg, type, onClose }) => (
     <div className={`fixed top-5 right-5 z-50 px-5 py-3 rounded-lg shadow-lg font-semibold text-sm transition-all

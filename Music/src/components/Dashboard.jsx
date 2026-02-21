@@ -3,7 +3,7 @@ import Navbar from './Navbar';
 import { useAuth, useUser } from '@clerk/clerk-react';
 import { useNavigate } from 'react-router-dom';
 
-const BASE = 'http://localhost:4000';
+const BASE = 'https://musico-y8f2.onrender.com';
 
 const Dashboard = () => {
     const { getToken } = useAuth();
